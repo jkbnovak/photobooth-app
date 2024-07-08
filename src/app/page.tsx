@@ -70,6 +70,9 @@ const Home = () => {
           <button onClick={submitPhoto}>Submit</button>
         </div>
       )}
+      <a href="/api/auth">
+        <button>Authenticate with Google</button>
+      </a>
     </div>
   )
 }
