@@ -1,35 +1,35 @@
 'use client'
 
-import { useState, useRef } from 'react';
-import Head from 'next/head';
-import { Camera } from 'react-camera-pro'; // Adjusted import statement
-import styles from './page.module.css';
+import { useState, useRef } from 'react'
+import Head from 'next/head'
+import { Camera } from 'react-camera-pro' // Adjusted import statement
+import styles from './page.module.css'
 
 const Home = () => {
-  const cameraRef = useRef<any>(null);
-  const [photo, setPhoto] = useState<string | null>(null);
-  const [comment, setComment] = useState<string>('');
-  const [showOverlay, setShowOverlay] = useState<boolean>(false);
+  const cameraRef = useRef<any>(null)
+  const [photo, setPhoto] = useState<string | null>(null)
+  const [comment, setComment] = useState<string>('')
+  const [showOverlay, setShowOverlay] = useState<boolean>(false)
 
-  console.log(Camera); // Verify that Camera is not undefined
+  console.log(Camera) // Verify that Camera is not undefined
 
   if (!Camera) {
-    console.error('Camera component is not imported correctly.');
-    return <div>Error loading Camera component.</div>;
+    console.error('Camera component is not imported correctly.')
+    return <div>Error loading Camera component.</div>
   }
 
   const takePhoto = () => {
     if (cameraRef.current) {
-      const photoData = cameraRef.current.takePhoto();
-      setPhoto(photoData);
-      setShowOverlay(true);
+      const photoData = cameraRef.current.takePhoto()
+      setPhoto(photoData)
+      setShowOverlay(true)
     }
-  };
+  }
 
   const retakePhoto = () => {
-    setPhoto(null);
-    setShowOverlay(false);
-  };
+    setPhoto(null)
+    setShowOverlay(false)
+  }
 
   const submitPhoto = async () => {
     if (photo && comment) {
@@ -39,18 +39,18 @@ const Home = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ photo, comment }),
-      });
+      })
 
       if (response.ok) {
-        alert('Photo and comment submitted successfully!');
-        setPhoto(null);
-        setComment('');
-        setShowOverlay(false);
+        alert('Photo and comment submitted successfully!')
+        setPhoto(null)
+        setComment('')
+        setShowOverlay(false)
       } else {
-        alert('Failed to submit photo and comment.');
+        alert('Failed to submit photo and comment.')
       }
     }
-  };
+  }
 
   return (
     <div className={styles.container}>
@@ -67,12 +67,16 @@ const Home = () => {
           aspectRatio={16 / 9}
           facingMode="environment"
           errorMessages={{
-            noCameraAccessible: 'No camera device accessible. Please connect your camera or try a different browser.',
+            noCameraAccessible:
+              'No camera device accessible. Please connect your camera or try a different browser.',
             permissionDenied: 'Permission denied. Please allow camera access.',
-            switchCamera: 'It is not possible to switch camera to different one because there is only one video device accessible.',
+            switchCamera:
+              'It is not possible to switch camera to different one because there is only one video device accessible.',
             canvas: 'Canvas is not supported.',
           }}
-          numberOfCamerasCallback={(numberOfCameras) => console.log('Number of cameras detected:', numberOfCameras)}
+          numberOfCamerasCallback={(numberOfCameras) =>
+            console.log('Number of cameras detected:', numberOfCameras)
+          }
         />
         <button onClick={takePhoto} className={styles.button}>
           Take Photo
@@ -101,7 +105,7 @@ const Home = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
