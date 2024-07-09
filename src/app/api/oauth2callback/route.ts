@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
+    process.env.GOOGLE_REDIRECT_URI,
   )
 
   try {
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
           expiryDate: tokens.expiry_date,
         },
       },
-      { upsert: true }
+      { upsert: true },
     )
 
     // Use an absolute URL for redirection
@@ -43,6 +43,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(absoluteUrl)
   } catch (error) {
     console.error('Error retrieving tokens:', error)
-    return NextResponse.json({ error: 'Failed to get token', details: error.message }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to get token', details: error.message },
+      { status: 500 },
+    )
   }
 }
