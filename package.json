@@ -2,13 +2,16 @@
   "name": "photobooth-app",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
-    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md}'"
-  },
+"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
+  "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md}'"
+},
+"engines": {
+  "node": ">=14.0.0"
+},
   "dependencies": {
     "googleapis": "^140.0.1",
     "mongodb": "^6.8.0",
