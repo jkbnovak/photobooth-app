@@ -1,60 +1,35 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from './page.module.css'
+import { useState, useRef } from 'react';
+import Head from 'next/head';
+import { Camera } from 'react-camera-pro'; // Adjusted import statement
+import styles from './page.module.css';
 
 const Home = () => {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const [photo, setPhoto] = useState<string | null>(null)
-  const [comment, setComment] = useState<string>('')
-  const [showOverlay, setShowOverlay] = useState<boolean>(false)
+  const cameraRef = useRef<any>(null);
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [comment, setComment] = useState<string>('');
+  const [showOverlay, setShowOverlay] = useState<boolean>(false);
 
-  useEffect(() => {
-    startCamera()
-  }, [])
+  console.log(Camera); // Verify that Camera is not undefined
 
-  const startCamera = async () => {
-    try {
-      const constraints = {
-        video: {
-          width: { ideal: 4096 },
-          height: { ideal: 2160 },
-        },
-      }
-      const stream = await navigator.mediaDevices.getUserMedia(constraints)
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        videoRef.current.play()
-      }
-    } catch (error) {
-      console.error('Error accessing camera:', error)
-    }
+  if (!Camera) {
+    console.error('Camera component is not imported correctly.');
+    return <div>Error loading Camera component.</div>;
   }
 
   const takePhoto = () => {
-    if (videoRef.current) {
-      const videoWidth = videoRef.current.videoWidth
-      const videoHeight = videoRef.current.videoHeight
-
-      const canvas = document.createElement('canvas')
-      canvas.width = videoWidth
-      canvas.height = videoHeight
-
-      const ctx = canvas.getContext('2d')
-      if (ctx) {
-        ctx.drawImage(videoRef.current, 0, 0, videoWidth, videoHeight)
-        setPhoto(canvas.toDataURL('image/jpeg'))
-        setShowOverlay(true)
-      }
+    if (cameraRef.current) {
+      const photoData = cameraRef.current.takePhoto();
+      setPhoto(photoData);
+      setShowOverlay(true);
     }
-  }
+  };
 
   const retakePhoto = () => {
-    setPhoto(null)
-    setShowOverlay(false)
-  }
+    setPhoto(null);
+    setShowOverlay(false);
+  };
 
   const submitPhoto = async () => {
     if (photo && comment) {
@@ -64,18 +39,18 @@ const Home = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ photo, comment }),
-      })
+      });
 
       if (response.ok) {
-        alert('Photo and comment submitted successfully!')
-        setPhoto(null)
-        setComment('')
-        setShowOverlay(false)
+        alert('Photo and comment submitted successfully!');
+        setPhoto(null);
+        setComment('');
+        setShowOverlay(false);
       } else {
-        alert('Failed to submit photo and comment.')
+        alert('Failed to submit photo and comment.');
       }
     }
-  }
+  };
 
   return (
     <div className={styles.container}>
@@ -87,10 +62,18 @@ const Home = () => {
       </Head>
       <h1 className={styles.title}>Photobooth App</h1>
       <div className={styles.camera}>
-        <video ref={videoRef} className={styles.video}></video>
-        <button onClick={startCamera} className={styles.button}>
-          Start Camera
-        </button>
+        <Camera
+          ref={cameraRef}
+          aspectRatio={16 / 9}
+          facingMode="environment"
+          errorMessages={{
+            noCameraAccessible: 'No camera device accessible. Please connect your camera or try a different browser.',
+            permissionDenied: 'Permission denied. Please allow camera access.',
+            switchCamera: 'It is not possible to switch camera to different one because there is only one video device accessible.',
+            canvas: 'Canvas is not supported.',
+          }}
+          numberOfCamerasCallback={(numberOfCameras) => console.log('Number of cameras detected:', numberOfCameras)}
+        />
         <button onClick={takePhoto} className={styles.button}>
           Take Photo
         </button>
@@ -118,7 +101,7 @@ const Home = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
