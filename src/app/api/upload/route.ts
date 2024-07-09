@@ -67,13 +67,13 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(photo.split(',')[1], 'base64')
 
     const fileMetadata = {
-      name: `photo_${Date.now()}.png`,
-      mimeType: 'image/png',
+      name: `photo_${Date.now()}.jpg`,
+      mimeType: 'image/jpeg',
     }
 
     // Convert buffer to stream
     const media = {
-      mimeType: 'image/png',
+      mimeType: 'image/jpeg',
       body: bufferToStream(buffer),
     }
 
