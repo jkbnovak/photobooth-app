@@ -1,28 +1,25 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import Head from 'next/head'
-import { Camera } from 'react-camera-pro' // Adjusted import statement
 import styles from './page.module.css'
 
 const Home = () => {
-  const cameraRef = useRef<any>(null)
   const [photo, setPhoto] = useState<string | null>(null)
   const [comment, setComment] = useState<string>('')
   const [showOverlay, setShowOverlay] = useState<boolean>(false)
+  const [file, setFile] = useState<File | null>(null)
 
-  console.log(Camera) // Verify that Camera is not undefined
-
-  if (!Camera) {
-    console.error('Camera component is not imported correctly.')
-    return <div>Error loading Camera component.</div>
-  }
-
-  const takePhoto = () => {
-    if (cameraRef.current) {
-      const photoData = cameraRef.current.takePhoto()
-      setPhoto(photoData)
-      setShowOverlay(true)
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0]
+    if (selectedFile) {
+      setFile(selectedFile)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPhoto(reader.result as string)
+        setShowOverlay(true)
+      }
+      reader.readAsDataURL(selectedFile)
     }
   }
 
@@ -32,7 +29,30 @@ const Home = () => {
   }
 
   const submitPhoto = async () => {
-    if (photo && comment) {
+    if (file && comment) {
+      const reader = new FileReader()
+      reader.onloadend = async () => {
+        const base64String = reader.result as string
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ photo: base64String, comment }),
+        })
+
+        if (response.ok) {
+          alert('Photo and comment submitted successfully!')
+          setPhoto(null)
+          setComment('')
+          setShowOverlay(false)
+          setFile(null)
+        } else {
+          alert('Failed to submit photo and comment.')
+        }
+      }
+      reader.readAsDataURL(file)
+    } else if (photo && comment) {
       const response = await fetch('/api/upload', {
         method: 'POST',
         headers: {
@@ -62,45 +82,32 @@ const Home = () => {
       </Head>
       <h1 className={styles.title}>Photobooth App</h1>
       <div className={styles.camera}>
-        <Camera
-          ref={cameraRef}
-          aspectRatio={16 / 9}
-          facingMode="environment"
-          errorMessages={{
-            noCameraAccessible:
-              'No camera device accessible. Please connect your camera or try a different browser.',
-            permissionDenied: 'Permission denied. Please allow camera access.',
-            switchCamera:
-              'It is not possible to switch camera to different one because there is only one video device accessible.',
-            canvas: 'Canvas is not supported.',
-          }}
-          numberOfCamerasCallback={(numberOfCameras) =>
-            console.log('Number of cameras detected:', numberOfCameras)
-          }
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className={styles.fileInput}
         />
-        <button onClick={takePhoto} className={styles.button}>
-          Take Photo
-        </button>
       </div>
       {showOverlay && photo && (
         <div className={styles.overlay}>
-          <div>
-            <img src={photo} alt="Captured" />
-            <div className={styles.actions}>
-              <button onClick={retakePhoto} className={styles.button}>
-                Retake Photo
-              </button>
-              <input
-                type="text"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Add a comment"
-                className={styles.input}
-              />
-              <button onClick={submitPhoto} className={styles.button}>
-                Submit
-              </button>
-            </div>
+          <div className={styles.photoContainer}>
+            <img src={photo} alt="Captured" className={styles.photo} />
+          </div>
+          <div className={styles.actions}>
+            <button onClick={retakePhoto} className={styles.button}>
+              Retake Photo
+            </button>
+            <input
+              type="text"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Add a comment"
+              className={styles.input}
+            />
+            <button onClick={submitPhoto} className={styles.button}>
+              Submit
+            </button>
           </div>
         </div>
       )}
