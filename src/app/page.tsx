@@ -85,6 +85,7 @@ const Home = () => {
         <input
           type="file"
           accept="image/*"
+          capture="environment"
           onChange={handleFileChange}
           className={styles.fileInput}
         />
