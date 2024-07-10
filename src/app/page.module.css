@@ -98,8 +98,9 @@
 
 .photo {
   width: auto;
-  height: 100px; /* Ensure images are the same height */
+  height: 150px; /* Increase the thumbnail size */
   border-radius: 8px;
+  cursor: pointer; /* Change cursor to indicate clickable */
 }
 
 .removeButton {
@@ -133,6 +134,27 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   box-sizing: border-box;
+}
+
+.fullImageOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+.fullImage {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 8px;
 }
 
 @media (max-width: 600px) {

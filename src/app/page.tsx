@@ -10,6 +10,7 @@ const Home = () => {
   const [photos, setPhotos] = useState<string[]>([])
   const [comment, setComment] = useState<string>('')
   const [showOverlay, setShowOverlay] = useState<boolean>(false)
+  const [showFullImage, setShowFullImage] = useState<string | null>(null)
   const [files, setFiles] = useState<File[]>([])
 
   const handleFilesSelected = (selectedFiles: FileList) => {
@@ -75,6 +76,14 @@ const Home = () => {
     }
   }
 
+  const handlePhotoClick = (photo: string) => {
+    setShowFullImage(photo)
+  }
+
+  const closeFullImage = () => {
+    setShowFullImage(null)
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -96,6 +105,7 @@ const Home = () => {
                   src={photo}
                   alt={`Captured ${index}`}
                   className={styles.photo}
+                  onClick={() => handlePhotoClick(photo)}
                 />
                 <button
                   className={styles.removeButton}
@@ -122,6 +132,15 @@ const Home = () => {
             </button>
             <PhotoInput onFilesSelected={handleFilesSelected} />
           </div>
+        </div>
+      )}
+      {showFullImage && (
+        <div className={styles.fullImageOverlay} onClick={closeFullImage}>
+          <img
+            src={showFullImage}
+            alt="Full Size"
+            className={styles.fullImage}
+          />
         </div>
       )}
     </div>
