@@ -122,8 +122,8 @@ const Home = () => {
               placeholder="Přidejte komentář"
               className={styles.textarea}
             />
-            <button onClick={submitPhotos} className={styles.button}>
-              <FaPaperPlane className={styles.icon} /> Odeslat
+            <button onClick={submitPhotos} className={styles.submitButton}>
+              <FaPaperPlane className={styles.icon} />
             </button>
           </div>
           <div className={styles.photoInputActions}>
