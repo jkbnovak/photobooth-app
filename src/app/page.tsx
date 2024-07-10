@@ -12,6 +12,7 @@ const Home = () => {
   const [showOverlay, setShowOverlay] = useState<boolean>(false)
   const [showFullImage, setShowFullImage] = useState<string | null>(null)
   const [files, setFiles] = useState<File[]>([])
+  const [loading, setLoading] = useState<boolean>(false) // Add loading state
 
   const handleFilesSelected = (selectedFiles: FileList) => {
     const filesArray = Array.from(selectedFiles)
@@ -42,6 +43,7 @@ const Home = () => {
 
   const submitPhotos = async () => {
     if (files.length > 0 && comment) {
+      setLoading(true) // Show loader
       const photosBase64: string[] = []
       const readers = files.map((file) => {
         return new Promise<void>((resolve) => {
@@ -64,14 +66,16 @@ const Home = () => {
         body: JSON.stringify({ photos: photosBase64, comment }),
       })
 
+      setLoading(false) // Hide loader
+
       if (response.ok) {
-        alert('Photos and comment submitted successfully!')
+        alert('Fotky a komentář byly úspěšně odeslány!')
         setPhotos([])
         setComment('')
         setShowOverlay(false)
         setFiles([])
       } else {
-        alert('Failed to submit photos and comment.')
+        alert('Nepodařilo se odeslat fotky a komentář.')
       }
     }
   }
@@ -92,7 +96,7 @@ const Home = () => {
           rel="stylesheet"
         />
       </Head>
-      <h1 className={styles.title}>Photobooth App</h1>
+      <h1 className={styles.title}>Fotokoutek App</h1>
       <div className={styles.camera}>
         <PhotoInput onFilesSelected={handleFilesSelected} />
       </div>
@@ -103,7 +107,7 @@ const Home = () => {
               <div key={index} className={styles.photoWrapper}>
                 <img
                   src={photo}
-                  alt={`Captured ${index}`}
+                  alt={`Zachyceno ${index}`}
                   className={styles.photo}
                   onClick={() => handlePhotoClick(photo)}
                 />
@@ -118,27 +122,32 @@ const Home = () => {
           </div>
           <div className={styles.actions}>
             <button onClick={retakePhotos} className={styles.button}>
-              Retake Photos
+              Předělat fotky
             </button>
             <input
               type="text"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Add a comment"
+              placeholder="Přidejte komentář"
               className={styles.input}
             />
             <button onClick={submitPhotos} className={styles.button}>
-              Submit
+              Odeslat
             </button>
             <PhotoInput onFilesSelected={handleFilesSelected} />
           </div>
+        </div>
+      )}
+      {loading && ( // Show loader when loading
+        <div className={styles.loaderOverlay}>
+          <div className={styles.loader}>Odesílání...</div>
         </div>
       )}
       {showFullImage && (
         <div className={styles.fullImageOverlay} onClick={closeFullImage}>
           <img
             src={showFullImage}
-            alt="Full Size"
+            alt="Plná velikost"
             className={styles.fullImage}
           />
         </div>

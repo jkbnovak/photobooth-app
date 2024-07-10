@@ -39,12 +39,14 @@ const PhotoInput: React.FC<PhotoInputProps> = ({ onFilesSelected }) => {
       >
         <FaCamera className={styles.icon} />
       </button>
+      <span className={styles.buttonLabel}>Vyfotit</span>
       <button
         onClick={() => document.getElementById('fileInput')?.click()}
         className={styles.iconButton}
       >
         <FaUpload className={styles.icon} />
       </button>
+      <span className={styles.buttonLabel}>Nahrát z telefonu</span>
     </div>
   )
 }
