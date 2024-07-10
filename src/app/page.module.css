@@ -10,12 +10,14 @@
   box-sizing: border-box;
   background-color: white;
   min-height: 100vh;
+  overflow: hidden; /* Prevent vertical scrolling */
 }
 
 .title {
   font-size: 2em;
   text-align: center;
   margin: 20px 0;
+  color: black; /* Ensure text is visible */
 }
 
 .camera {
@@ -64,6 +66,7 @@
   font-size: 1.2em;
   margin-top: 5px;
   text-align: center;
+  color: black; /* Ensure text is visible */
 }
 
 .fileInput {
@@ -126,11 +129,12 @@
 
 .actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Arrange icons side by side */
   align-items: center;
   gap: 10px;
   margin-top: 20px;
   width: 100%;
+  justify-content: center;
 }
 
 .input {
@@ -180,6 +184,7 @@
 .loader {
   font-size: 1.5em;
   font-weight: bold;
+  color: black; /* Ensure text is visible */
 }
 
 @media (max-width: 600px) {
@@ -190,5 +195,9 @@
   .button,
   .input {
     max-width: 100%;
+  }
+
+  .actions {
+    flex-direction: column; /* Stack icons vertically on small screens */
   }
 }
