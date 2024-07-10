@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Head from 'next/head'
 import styles from './page.module.css'
 import PhotoInput from './components/PhotoInput'
-import { FaTimesCircle } from 'react-icons/fa'
+import { FaTimesCircle, FaPaperPlane } from 'react-icons/fa'
 
 const Home = () => {
   const [photos, setPhotos] = useState<string[]>([])
@@ -34,11 +34,6 @@ const Home = () => {
   const removePhoto = (index: number) => {
     setPhotos((prevPhotos) => prevPhotos.filter((_, i) => i !== index))
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index))
-  }
-
-  const retakePhotos = () => {
-    setPhotos([])
-    setShowOverlay(false)
   }
 
   const submitPhotos = async () => {
@@ -121,19 +116,17 @@ const Home = () => {
             ))}
           </div>
           <div className={styles.actions}>
-            <button onClick={retakePhotos} className={styles.button}>
-              Předělat fotky
-            </button>
-            <input
-              type="text"
+            <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Přidejte komentář"
-              className={styles.input}
+              className={styles.textarea}
             />
             <button onClick={submitPhotos} className={styles.button}>
-              Odeslat
+              <FaPaperPlane className={styles.icon} /> Odeslat
             </button>
+          </div>
+          <div className={styles.photoInputActions}>
             <PhotoInput onFilesSelected={handleFilesSelected} />
           </div>
         </div>

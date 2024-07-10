@@ -129,15 +129,14 @@
 
 .actions {
   display: flex;
-  flex-direction: row; /* Arrange icons side by side */
+  flex-direction: column; /* Stack elements vertically */
   align-items: center;
   gap: 10px;
   margin-top: 20px;
   width: 100%;
-  justify-content: center;
 }
 
-.input {
+.textarea {
   padding: 10px;
   font-size: 1em;
   width: 100%;
@@ -145,6 +144,24 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   box-sizing: border-box;
+  min-height: 100px; /* Make textarea multiline */
+}
+
+.photoInputActions {
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.photoInputActions .iconButton {
+  width: 50px; /* Smaller button size */
+  height: 50px; /* Smaller button size */
+}
+
+.photoInputActions .icon {
+  font-size: 24px; /* Smaller icon size */
 }
 
 .fullImageOverlay {
@@ -193,7 +210,8 @@
   }
 
   .button,
-  .input {
+  .input,
+  .textarea {
     max-width: 100%;
   }
 
