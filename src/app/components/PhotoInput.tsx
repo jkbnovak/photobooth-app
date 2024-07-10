@@ -4,9 +4,13 @@ import styles from '../page.module.css'
 
 interface PhotoInputProps {
   onFilesSelected: (files: FileList) => void
+  isModal?: boolean
 }
 
-const PhotoInput: React.FC<PhotoInputProps> = ({ onFilesSelected }) => {
+const PhotoInput: React.FC<PhotoInputProps> = ({
+  onFilesSelected,
+  isModal = false,
+}) => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (files) {
@@ -15,7 +19,9 @@ const PhotoInput: React.FC<PhotoInputProps> = ({ onFilesSelected }) => {
   }
 
   return (
-    <div className={styles.buttonContainer}>
+    <div
+      className={isModal ? styles.modalButtonContainer : styles.buttonContainer}
+    >
       <input
         type="file"
         accept="image/*"
@@ -33,20 +39,32 @@ const PhotoInput: React.FC<PhotoInputProps> = ({ onFilesSelected }) => {
         onChange={handleFileChange}
         style={{ display: 'none' }}
       />
-      <button
-        onClick={() => document.getElementById('cameraInput')?.click()}
-        className={styles.iconButton}
-      >
-        <FaCamera className={styles.icon} />
-      </button>
-      <span className={styles.buttonLabel}>Vyfotit</span>
-      <button
-        onClick={() => document.getElementById('fileInput')?.click()}
-        className={styles.iconButton}
-      >
-        <FaUpload className={styles.icon} />
-      </button>
-      <span className={styles.buttonLabel}>Nahrát z telefonu</span>
+      <div className={styles.buttonWrapper}>
+        <button
+          onClick={() => document.getElementById('cameraInput')?.click()}
+          className={isModal ? styles.modalIconButton : styles.iconButton}
+        >
+          <FaCamera className={isModal ? styles.modalIcon : styles.icon} />
+        </button>
+        <span
+          className={isModal ? styles.modalButtonLabel : styles.buttonLabel}
+        >
+          Vyfotit fotku
+        </span>
+      </div>
+      <div className={styles.buttonWrapper}>
+        <button
+          onClick={() => document.getElementById('fileInput')?.click()}
+          className={isModal ? styles.modalIconButton : styles.iconButton}
+        >
+          <FaUpload className={isModal ? styles.modalIcon : styles.icon} />
+        </button>
+        <span
+          className={isModal ? styles.modalButtonLabel : styles.buttonLabel}
+        >
+          Nahrát z telefonu
+        </span>
+      </div>
     </div>
   )
 }

@@ -129,7 +129,7 @@
 
 .actions {
   display: flex;
-  flex-direction: column; /* Stack elements vertically */
+  flex-direction: column;
   align-items: center;
   gap: 10px;
   margin-top: 20px;
@@ -147,22 +147,87 @@
   min-height: 100px; /* Make textarea multiline */
 }
 
-.photoInputActions {
+.buttonWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modalButtonContainer {
   display: flex;
   flex-direction: row; /* Arrange buttons horizontally */
   align-items: center;
   gap: 10px;
-  margin-top: 10px;
   justify-content: center;
+  margin-bottom: 10px; /* Add space below the button container */
 }
 
-.photoInputActions .iconButton {
+.modalIconButton {
   width: 50px; /* Smaller button size */
   height: 50px; /* Smaller button size */
+  border-radius: 50%;
+  background-color: transparent;
+  border: 2px solid black;
+  color: black;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+  font-size: 24px; /* Smaller icon size */
 }
 
-.photoInputActions .icon {
+.modalIconButton:hover {
+  background-color: black;
+  color: white;
+}
+
+.modalIcon {
   font-size: 24px; /* Smaller icon size */
+}
+
+.modalButtonLabel {
+  font-size: 1.2em;
+  margin-top: 5px;
+  text-align: center;
+  color: black; /* Ensure text is visible */
+  white-space: pre-wrap; /* Allow text to wrap */
+  text-align: center;
+}
+
+.submitButtonContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.submitButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px; /* Smaller button size */
+  height: 50px; /* Smaller button size */
+  border-radius: 50%;
+  background-color: transparent;
+  border: 2px solid black;
+  color: black;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+  font-size: 24px; /* Smaller icon size */
+}
+
+.submitButton:hover {
+  background-color: black;
+  color: white;
+}
+
+.submitButtonLabel {
+  font-size: 1.2em;
+  margin-top: 5px;
+  text-align: center;
+  color: black; /* Ensure text is visible */
 }
 
 .fullImageOverlay {
@@ -203,28 +268,6 @@
   font-size: 1.5em;
   font-weight: bold;
   color: black; /* Ensure text is visible */
-}
-
-.submitButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100px; /* Increase button size */
-  height: 100px; /* Increase button size */
-  border-radius: 50%;
-  background-color: transparent;
-  border: 2px solid black;
-  color: black;
-  cursor: pointer;
-  transition:
-    background-color 0.3s,
-    color 0.3s;
-  font-size: 32px; /* Increase icon size */
-}
-
-.submitButton:hover {
-  background-color: black;
-  color: white;
 }
 
 @media (max-width: 600px) {

@@ -115,6 +115,7 @@ const Home = () => {
               </div>
             ))}
           </div>
+          <PhotoInput onFilesSelected={handleFilesSelected} isModal={true} />
           <div className={styles.actions}>
             <textarea
               value={comment}
@@ -122,12 +123,12 @@ const Home = () => {
               placeholder="Přidejte komentář"
               className={styles.textarea}
             />
-            <button onClick={submitPhotos} className={styles.submitButton}>
-              <FaPaperPlane className={styles.icon} />
-            </button>
-          </div>
-          <div className={styles.photoInputActions}>
-            <PhotoInput onFilesSelected={handleFilesSelected} />
+            <div className={styles.submitButtonContainer}>
+              <button onClick={submitPhotos} className={styles.submitButton}>
+                <FaPaperPlane className={styles.icon} />
+              </button>
+              <span className={styles.submitButtonLabel}>Odeslat</span>
+            </div>
           </div>
         </div>
       )}
