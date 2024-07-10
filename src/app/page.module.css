@@ -76,6 +76,7 @@
   align-items: center;
   padding: 20px;
   box-sizing: border-box;
+  overflow: hidden; /* Prevent modal from expanding beyond screen */
 }
 
 .photoContainer {
@@ -84,17 +85,20 @@
   white-space: nowrap;
   padding: 10px 0;
   max-width: 100%;
+  align-items: center;
 }
 
 .photoWrapper {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
   margin-right: 10px;
 }
 
 .photo {
-  width: 100%;
-  max-width: 300px;
+  width: auto;
+  height: 100px; /* Ensure images are the same height */
   border-radius: 8px;
 }
 
