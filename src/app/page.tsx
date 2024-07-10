@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Head from 'next/head'
 import styles from './page.module.css'
 import PhotoInput from './components/PhotoInput'
+import { FaTimesCircle } from 'react-icons/fa'
 
 const Home = () => {
   const [photos, setPhotos] = useState<string[]>([])
@@ -13,19 +14,24 @@ const Home = () => {
 
   const handleFilesSelected = (selectedFiles: FileList) => {
     const filesArray = Array.from(selectedFiles)
-    setFiles(filesArray)
+    setFiles((prevFiles) => [...prevFiles, ...filesArray])
     const images: string[] = []
     filesArray.forEach((file) => {
       const reader = new FileReader()
       reader.onloadend = () => {
         images.push(reader.result as string)
         if (images.length === filesArray.length) {
-          setPhotos(images)
+          setPhotos((prevPhotos) => [...prevPhotos, ...images])
           setShowOverlay(true)
         }
       }
       reader.readAsDataURL(file)
     })
+  }
+
+  const removePhoto = (index: number) => {
+    setPhotos((prevPhotos) => prevPhotos.filter((_, i) => i !== index))
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index))
   }
 
   const retakePhotos = () => {
@@ -85,12 +91,19 @@ const Home = () => {
         <div className={styles.overlay}>
           <div className={styles.photoContainer}>
             {photos.map((photo, index) => (
-              <img
-                key={index}
-                src={photo}
-                alt={`Captured ${index}`}
-                className={styles.photo}
-              />
+              <div key={index} className={styles.photoWrapper}>
+                <img
+                  src={photo}
+                  alt={`Captured ${index}`}
+                  className={styles.photo}
+                />
+                <button
+                  className={styles.removeButton}
+                  onClick={() => removePhoto(index)}
+                >
+                  <FaTimesCircle />
+                </button>
+              </div>
             ))}
           </div>
           <div className={styles.actions}>
@@ -107,6 +120,7 @@ const Home = () => {
             <button onClick={submitPhotos} className={styles.button}>
               Submit
             </button>
+            <PhotoInput onFilesSelected={handleFilesSelected} />
           </div>
         </div>
       )}

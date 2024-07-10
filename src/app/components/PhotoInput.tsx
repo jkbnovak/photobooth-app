@@ -1,45 +1,50 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { FaCamera, FaUpload } from 'react-icons/fa'
+import styles from '../page.module.css'
 
-const PhotoInput: React.FC<{ onFilesSelected: (files: FileList) => void }> = ({
-  onFilesSelected,
-}) => {
-  const [selectedImages, setSelectedImages] = useState<string[]>([])
+interface PhotoInputProps {
+  onFilesSelected: (files: FileList) => void
+}
 
+const PhotoInput: React.FC<PhotoInputProps> = ({ onFilesSelected }) => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (files) {
       onFilesSelected(files)
-      const images: string[] = []
-      Array.from(files).forEach((file) => {
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          images.push(reader.result as string)
-          if (images.length === files.length) {
-            setSelectedImages(images)
-          }
-        }
-        reader.readAsDataURL(file)
-      })
     }
   }
 
   return (
-    <div>
+    <div className={styles.buttonContainer}>
       <input
         type="file"
         accept="image/*"
         capture="environment"
+        id="cameraInput"
         multiple
         onChange={handleFileChange}
+        style={{ display: 'none' }}
       />
-      {selectedImages.map((image, index) => (
-        <img
-          key={index}
-          src={image}
-          alt={`Selected ${index}`}
-          style={{ width: '100%', maxWidth: '300px', marginTop: '10px' }}
-        />
-      ))}
+      <input
+        type="file"
+        accept="image/*"
+        id="fileInput"
+        multiple
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+      />
+      <button
+        onClick={() => document.getElementById('cameraInput')?.click()}
+        className={styles.iconButton}
+      >
+        <FaCamera className={styles.icon} />
+      </button>
+      <button
+        onClick={() => document.getElementById('fileInput')?.click()}
+        className={styles.iconButton}
+      >
+        <FaUpload className={styles.icon} />
+      </button>
     </div>
   )
 }
