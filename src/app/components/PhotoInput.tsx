@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 
-const PhotoInput: React.FC<{ onFilesSelected: (files: FileList) => void }> = ({ onFilesSelected }) => {
+const PhotoInput: React.FC<{ onFilesSelected: (files: FileList) => void }> = ({
+  onFilesSelected,
+}) => {
   const [selectedImages, setSelectedImages] = useState<string[]>([])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

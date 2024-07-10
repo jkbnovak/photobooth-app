@@ -85,7 +85,12 @@ const Home = () => {
         <div className={styles.overlay}>
           <div className={styles.photoContainer}>
             {photos.map((photo, index) => (
-              <img key={index} src={photo} alt={`Captured ${index}`} className={styles.photo} />
+              <img
+                key={index}
+                src={photo}
+                alt={`Captured ${index}`}
+                className={styles.photo}
+              />
             ))}
           </div>
           <div className={styles.actions}>
