@@ -1,14 +1,16 @@
 import React from 'react'
-import { FaCamera, FaUpload } from 'react-icons/fa'
+import { FaCamera, FaUpload, FaQuestionCircle } from 'react-icons/fa'
 import styles from '../page.module.css'
 
 interface PhotoInputProps {
   onFilesSelected: (files: FileList) => void
+  openHowItWorksModal?: () => void
   isModal?: boolean
 }
 
 const PhotoInput: React.FC<PhotoInputProps> = ({
   onFilesSelected,
+  openHowItWorksModal,
   isModal = false,
 }) => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,6 +67,14 @@ const PhotoInput: React.FC<PhotoInputProps> = ({
           Nahrát z telefonu
         </span>
       </div>
+      {!isModal && openHowItWorksModal && (
+        <div className={styles.buttonWrapper}>
+          <button onClick={openHowItWorksModal} className={styles.iconButton}>
+            <FaQuestionCircle className={styles.icon} />
+          </button>
+          <span className={styles.buttonLabel}>Jak to funguje?</span>
+        </div>
+      )}
     </div>
   )
 }

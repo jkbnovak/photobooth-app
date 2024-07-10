@@ -10,14 +10,14 @@
   box-sizing: border-box;
   background-color: white;
   min-height: 100vh;
-  overflow: hidden; /* Prevent vertical scrolling */
+  overflow: hidden;
 }
 
 .title {
   font-size: 2em;
   text-align: center;
   margin: 20px 0;
-  color: black; /* Ensure text is visible */
+  color: black;
 }
 
 .camera {
@@ -40,8 +40,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100px; /* Increase button size */
-  height: 100px; /* Increase button size */
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   background-color: transparent;
   border: 2px solid black;
@@ -50,7 +50,7 @@
   transition:
     background-color 0.3s,
     color 0.3s;
-  font-size: 32px; /* Increase icon size */
+  font-size: 32px;
 }
 
 .iconButton:hover {
@@ -59,14 +59,14 @@
 }
 
 .icon {
-  font-size: 42px; /* Increase icon size */
+  font-size: 42px;
 }
 
 .buttonLabel {
   font-size: 1.2em;
   margin-top: 5px;
   text-align: center;
-  color: black; /* Ensure text is visible */
+  color: black;
 }
 
 .fileInput {
@@ -79,14 +79,14 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: white; /* Change modal background to white */
+  background: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 20px;
   box-sizing: border-box;
-  overflow: hidden; /* Prevent modal from expanding beyond screen */
+  overflow: hidden;
 }
 
 .photoContainer {
@@ -108,9 +108,9 @@
 
 .photo {
   width: auto;
-  height: 150px; /* Increase the thumbnail size */
+  height: 150px;
   border-radius: 8px;
-  cursor: pointer; /* Change cursor to indicate clickable */
+  cursor: pointer;
 }
 
 .removeButton {
@@ -144,7 +144,8 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   box-sizing: border-box;
-  min-height: 100px; /* Make textarea multiline */
+  min-height: 100px;
+  background-color: white; /* Ensure white background */
 }
 
 .buttonWrapper {
@@ -155,16 +156,16 @@
 
 .modalButtonContainer {
   display: flex;
-  flex-direction: row; /* Arrange buttons horizontally */
+  flex-direction: row;
   align-items: center;
   gap: 10px;
   justify-content: center;
-  margin-bottom: 10px; /* Add space below the button container */
+  margin-bottom: 10px;
 }
 
 .modalIconButton {
-  width: 50px; /* Smaller button size */
-  height: 50px; /* Smaller button size */
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background-color: transparent;
   border: 2px solid black;
@@ -173,7 +174,7 @@
   transition:
     background-color 0.3s,
     color 0.3s;
-  font-size: 24px; /* Smaller icon size */
+  font-size: 24px;
 }
 
 .modalIconButton:hover {
@@ -182,15 +183,15 @@
 }
 
 .modalIcon {
-  font-size: 24px; /* Smaller icon size */
+  font-size: 24px;
 }
 
 .modalButtonLabel {
   font-size: 1.2em;
   margin-top: 5px;
   text-align: center;
-  color: black; /* Ensure text is visible */
-  white-space: pre-wrap; /* Allow text to wrap */
+  color: black;
+  white-space: pre-wrap;
   text-align: center;
 }
 
@@ -205,8 +206,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px; /* Smaller button size */
-  height: 50px; /* Smaller button size */
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background-color: transparent;
   border: 2px solid black;
@@ -215,7 +216,7 @@
   transition:
     background-color 0.3s,
     color 0.3s;
-  font-size: 24px; /* Smaller icon size */
+  font-size: 24px;
 }
 
 .submitButton:hover {
@@ -227,7 +228,7 @@
   font-size: 1.2em;
   margin-top: 5px;
   text-align: center;
-  color: black; /* Ensure text is visible */
+  color: black;
 }
 
 .fullImageOverlay {
@@ -267,7 +268,34 @@
 .loader {
   font-size: 1.5em;
   font-weight: bold;
-  color: black; /* Ensure text is visible */
+  color: black;
+}
+
+.howItWorksOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+.howItWorksContent {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.howItWorksText {
+  font-size: 1em;
+  color: black;
 }
 
 @media (max-width: 600px) {
@@ -282,6 +310,6 @@
   }
 
   .actions {
-    flex-direction: column; /* Stack icons vertically on small screens */
+    flex-direction: column;
   }
 }

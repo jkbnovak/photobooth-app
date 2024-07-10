@@ -12,7 +12,8 @@ const Home = () => {
   const [showOverlay, setShowOverlay] = useState<boolean>(false)
   const [showFullImage, setShowFullImage] = useState<string | null>(null)
   const [files, setFiles] = useState<File[]>([])
-  const [loading, setLoading] = useState<boolean>(false) // Add loading state
+  const [loading, setLoading] = useState<boolean>(false)
+  const [showHowItWorks, setShowHowItWorks] = useState<boolean>(false)
 
   const handleFilesSelected = (selectedFiles: FileList) => {
     const filesArray = Array.from(selectedFiles)
@@ -37,8 +38,8 @@ const Home = () => {
   }
 
   const submitPhotos = async () => {
-    if (files.length > 0 && comment) {
-      setLoading(true) // Show loader
+    if (files.length > 0) {
+      setLoading(true)
       const photosBase64: string[] = []
       const readers = files.map((file) => {
         return new Promise<void>((resolve) => {
@@ -61,7 +62,7 @@ const Home = () => {
         body: JSON.stringify({ photos: photosBase64, comment }),
       })
 
-      setLoading(false) // Hide loader
+      setLoading(false)
 
       if (response.ok) {
         alert('Fotky a komentář byly úspěšně odeslány!')
@@ -83,6 +84,14 @@ const Home = () => {
     setShowFullImage(null)
   }
 
+  const openHowItWorksModal = () => {
+    setShowHowItWorks(true)
+  }
+
+  const closeHowItWorksModal = () => {
+    setShowHowItWorks(false)
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -91,12 +100,18 @@ const Home = () => {
           rel="stylesheet"
         />
       </Head>
-      <h1 className={styles.title}>Fotokoutek App</h1>
+      <h1 className={styles.title}>Fotokoutek</h1>
+      <h3 className={styles.title}>#svatbahrdinu</h3>
       <div className={styles.camera}>
-        <PhotoInput onFilesSelected={handleFilesSelected} />
+        <PhotoInput
+          onFilesSelected={handleFilesSelected}
+          openHowItWorksModal={openHowItWorksModal}
+        />
       </div>
       {showOverlay && photos.length > 0 && (
         <div className={styles.overlay}>
+          <h1 className={styles.title}>Fotokoutek</h1>
+          <h3 className={styles.title}>#svatbahrdinu</h3>
           <div className={styles.photoContainer}>
             {photos.map((photo, index) => (
               <div key={index} className={styles.photoWrapper}>
@@ -132,7 +147,7 @@ const Home = () => {
           </div>
         </div>
       )}
-      {loading && ( // Show loader when loading
+      {loading && (
         <div className={styles.loaderOverlay}>
           <div className={styles.loader}>Odesílání...</div>
         </div>
@@ -144,6 +159,23 @@ const Home = () => {
             alt="Plná velikost"
             className={styles.fullImage}
           />
+        </div>
+      )}
+      {showHowItWorks && (
+        <div
+          className={styles.howItWorksOverlay}
+          onClick={closeHowItWorksModal}
+        >
+          <div className={styles.howItWorksContent}>
+            <h1 className={styles.title}>How does it work?</h1>
+            <p className={styles.howItWorksText}>
+              Tato aplikace vám umožňuje pořizovat fotografie, přidávat
+              komentáře a nahrávat je. Jednoduše klikněte na ikonu fotoaparátu
+              pro pořízení fotografie nebo na ikonu nahrávání pro výběr
+              fotografií z vašeho zařízení. Po výběru fotografií můžete přidat
+              komentář a poté stisknout tlačítko odeslat pro nahrání všeho.
+            </p>
+          </div>
         </div>
       )}
     </div>
