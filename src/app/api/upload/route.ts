@@ -53,7 +53,7 @@ function bufferToStream(buffer) {
 }
 
 export async function POST(request: NextRequest) {
-  const { photo, comment } = await request.json()
+  const { photos, comment } = await request.json()
 
   try {
     const client = await clientPromise
@@ -63,40 +63,45 @@ export async function POST(request: NextRequest) {
     const oauth2Client = await getAuthenticatedClient()
     const drive = google.drive({ version: 'v3', auth: oauth2Client })
 
-    // Convert the photo to a Buffer
-    const buffer = Buffer.from(photo.split(',')[1], 'base64')
+    const photoUrls: string[] = []
 
-    const fileMetadata = {
-      name: `photo_${Date.now()}.jpg`,
-      mimeType: 'image/jpeg',
+    for (const photo of photos) {
+      // Convert the photo to a Buffer
+      const buffer = Buffer.from(photo.split(',')[1], 'base64')
+
+      const fileMetadata = {
+        name: `photo_${Date.now()}.jpg`,
+        mimeType: 'image/jpeg',
+      }
+
+      // Convert buffer to stream
+      const media = {
+        mimeType: 'image/jpeg',
+        body: bufferToStream(buffer),
+      }
+
+      const response = await drive.files.create({
+        requestBody: fileMetadata,
+        media: media,
+        fields: 'id',
+      })
+
+      const photoId = response.data.id
+      const photoUrl = `https://drive.google.com/uc?id=${photoId}`
+      photoUrls.push(photoUrl)
     }
-
-    // Convert buffer to stream
-    const media = {
-      mimeType: 'image/jpeg',
-      body: bufferToStream(buffer),
-    }
-
-    const response = await drive.files.create({
-      requestBody: fileMetadata,
-      media: media,
-      fields: 'id',
-    })
-
-    const photoId = response.data.id
-    const photoUrl = `https://drive.google.com/uc?id=${photoId}`
 
     await collection.insertOne({
-      photoUrl,
+      photoUrls,
       comment,
       createdAt: new Date(),
     })
 
-    return NextResponse.json({ message: 'Photo and comment saved', photoUrl })
+    return NextResponse.json({ message: 'Photos and comment saved', photoUrls })
   } catch (e) {
     console.error(e)
     return NextResponse.json(
-      { error: 'Failed to save photo and comment' },
+      { error: 'Failed to save photos and comment' },
       { status: 500 },
     )
   }

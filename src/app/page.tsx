@@ -3,71 +3,68 @@
 import { useState } from 'react'
 import Head from 'next/head'
 import styles from './page.module.css'
+import PhotoInput from './components/PhotoInput'
 
 const Home = () => {
-  const [photo, setPhoto] = useState<string | null>(null)
+  const [photos, setPhotos] = useState<string[]>([])
   const [comment, setComment] = useState<string>('')
   const [showOverlay, setShowOverlay] = useState<boolean>(false)
-  const [file, setFile] = useState<File | null>(null)
+  const [files, setFiles] = useState<File[]>([])
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0]
-    if (selectedFile) {
-      setFile(selectedFile)
+  const handleFilesSelected = (selectedFiles: FileList) => {
+    const filesArray = Array.from(selectedFiles)
+    setFiles(filesArray)
+    const images: string[] = []
+    filesArray.forEach((file) => {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setPhoto(reader.result as string)
-        setShowOverlay(true)
-      }
-      reader.readAsDataURL(selectedFile)
-    }
-  }
-
-  const retakePhoto = () => {
-    setPhoto(null)
-    setShowOverlay(false)
-  }
-
-  const submitPhoto = async () => {
-    if (file && comment) {
-      const reader = new FileReader()
-      reader.onloadend = async () => {
-        const base64String = reader.result as string
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ photo: base64String, comment }),
-        })
-
-        if (response.ok) {
-          alert('Photo and comment submitted successfully!')
-          setPhoto(null)
-          setComment('')
-          setShowOverlay(false)
-          setFile(null)
-        } else {
-          alert('Failed to submit photo and comment.')
+        images.push(reader.result as string)
+        if (images.length === filesArray.length) {
+          setPhotos(images)
+          setShowOverlay(true)
         }
       }
       reader.readAsDataURL(file)
-    } else if (photo && comment) {
+    })
+  }
+
+  const retakePhotos = () => {
+    setPhotos([])
+    setShowOverlay(false)
+  }
+
+  const submitPhotos = async () => {
+    if (files.length > 0 && comment) {
+      const photosBase64: string[] = []
+      const readers = files.map((file) => {
+        return new Promise<void>((resolve) => {
+          const reader = new FileReader()
+          reader.onloadend = () => {
+            photosBase64.push(reader.result as string)
+            resolve()
+          }
+          reader.readAsDataURL(file)
+        })
+      })
+
+      await Promise.all(readers)
+
       const response = await fetch('/api/upload', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ photo, comment }),
+        body: JSON.stringify({ photos: photosBase64, comment }),
       })
 
       if (response.ok) {
-        alert('Photo and comment submitted successfully!')
-        setPhoto(null)
+        alert('Photos and comment submitted successfully!')
+        setPhotos([])
         setComment('')
         setShowOverlay(false)
+        setFiles([])
       } else {
-        alert('Failed to submit photo and comment.')
+        alert('Failed to submit photos and comment.')
       }
     }
   }
@@ -82,22 +79,18 @@ const Home = () => {
       </Head>
       <h1 className={styles.title}>Photobooth App</h1>
       <div className={styles.camera}>
-        <input
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={handleFileChange}
-          className={styles.fileInput}
-        />
+        <PhotoInput onFilesSelected={handleFilesSelected} />
       </div>
-      {showOverlay && photo && (
+      {showOverlay && photos.length > 0 && (
         <div className={styles.overlay}>
           <div className={styles.photoContainer}>
-            <img src={photo} alt="Captured" className={styles.photo} />
+            {photos.map((photo, index) => (
+              <img key={index} src={photo} alt={`Captured ${index}`} className={styles.photo} />
+            ))}
           </div>
           <div className={styles.actions}>
-            <button onClick={retakePhoto} className={styles.button}>
-              Retake Photo
+            <button onClick={retakePhotos} className={styles.button}>
+              Retake Photos
             </button>
             <input
               type="text"
@@ -106,7 +99,7 @@ const Home = () => {
               placeholder="Add a comment"
               className={styles.input}
             />
-            <button onClick={submitPhoto} className={styles.button}>
+            <button onClick={submitPhotos} className={styles.button}>
               Submit
             </button>
           </div>

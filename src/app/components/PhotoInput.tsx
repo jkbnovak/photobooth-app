@@ -1,18 +1,23 @@
 import React, { useState } from 'react'
 
-const PhotoInput: React.FC = () => {
-  const [selectedImage, setSelectedImage] = useState<
-    string | ArrayBuffer | null
-  >(null)
+const PhotoInput: React.FC<{ onFilesSelected: (files: FileList) => void }> = ({ onFilesSelected }) => {
+  const [selectedImages, setSelectedImages] = useState<string[]>([])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setSelectedImage(reader.result)
-      }
-      reader.readAsDataURL(file)
+    const files = event.target.files
+    if (files) {
+      onFilesSelected(files)
+      const images: string[] = []
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          images.push(reader.result as string)
+          if (images.length === files.length) {
+            setSelectedImages(images)
+          }
+        }
+        reader.readAsDataURL(file)
+      })
     }
   }
 
@@ -22,15 +27,17 @@ const PhotoInput: React.FC = () => {
         type="file"
         accept="image/*"
         capture="environment"
+        multiple
         onChange={handleFileChange}
       />
-      {selectedImage && (
+      {selectedImages.map((image, index) => (
         <img
-          src={selectedImage as string}
-          alt="Selected"
+          key={index}
+          src={image}
+          alt={`Selected ${index}`}
           style={{ width: '100%', maxWidth: '300px', marginTop: '10px' }}
         />
-      )}
+      ))}
     </div>
   )
 }
