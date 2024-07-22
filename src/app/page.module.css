@@ -146,8 +146,8 @@
   box-sizing: border-box;
   min-height: 100px;
   background-color: white; /* Ensure white background */
+  color: black; /* Set text color to black */
 }
-
 .buttonWrapper {
   display: flex;
   flex-direction: column;
