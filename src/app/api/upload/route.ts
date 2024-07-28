@@ -8,7 +8,6 @@ async function getAuthenticatedClient() {
   const db = client.db('photobooth')
   const collection = db.collection('users')
 
-  // Retrieve tokens from the database
   const user = await collection.findOne({ userId: 'default_user' })
 
   if (!user) {
@@ -27,7 +26,6 @@ async function getAuthenticatedClient() {
     expiry_date: user.expiryDate,
   })
 
-  // Check if the access token is expired
   if (Date.now() >= user.expiryDate) {
     const { credentials } = await oauth2Client.refreshAccessToken()
     await collection.updateOne(
@@ -45,7 +43,6 @@ async function getAuthenticatedClient() {
   return oauth2Client
 }
 
-// Function to convert buffer to stream
 function bufferToStream(buffer) {
   const stream = new PassThrough()
   stream.end(buffer)
@@ -63,10 +60,9 @@ export async function POST(request: NextRequest) {
     const oauth2Client = await getAuthenticatedClient()
     const drive = google.drive({ version: 'v3', auth: oauth2Client })
 
-    const photoUrls: string[] = []
+    const photoIds: string[] = []
 
     for (const photo of photos) {
-      // Convert the photo to a Buffer
       const buffer = Buffer.from(photo.split(',')[1], 'base64')
 
       const fileMetadata = {
@@ -74,7 +70,6 @@ export async function POST(request: NextRequest) {
         mimeType: 'image/jpeg',
       }
 
-      // Convert buffer to stream
       const media = {
         mimeType: 'image/jpeg',
         body: bufferToStream(buffer),
@@ -87,22 +82,30 @@ export async function POST(request: NextRequest) {
       })
 
       const photoId = response.data.id
-      const photoUrl = `https://drive.google.com/uc?id=${photoId}`
-      photoUrls.push(photoUrl)
+
+      await drive.permissions.create({
+        fileId: photoId,
+        requestBody: {
+          role: 'reader',
+          type: 'anyone',
+        },
+      })
+
+      photoIds.push(photoId)
     }
 
     await collection.insertOne({
-      photoUrls,
+      photoIds,
       comment,
       createdAt: new Date(),
     })
 
-    return NextResponse.json({ message: 'Photos and comment saved', photoUrls })
+    return NextResponse.json({ message: 'Photos and comment saved', photoIds })
   } catch (e) {
     console.error(e)
     return NextResponse.json(
       { error: 'Failed to save photos and comment' },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }
