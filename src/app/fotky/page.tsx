@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useEffect, useState } from 'react'
 import axios from 'axios'
@@ -58,18 +58,19 @@ const FotkyPage = () => {
       <h1>Fotky</h1>
       {photos.length > 0 ? (
         <Slider {...settings}>
-          {photos.map(photoSet => (
+          {photos.map((photoSet) => (
             <div key={photoSet._id}>
               {photoSet.photoUrls.map((url, index) => (
                 <div key={index}>
-                  <img 
-                    src={url} 
-                    alt={`Photo ${index + 1}`} 
-                    style={{ width: '100%' }} 
-                    onError={(e) => { 
-                      console.error('Image failed to load:', e);  // Log the error event object
-                      console.error('Failed URL:', e.currentTarget.src);  // Log the failed image URL
-                      e.currentTarget.src = 'https://via.placeholder.com/600x400?text=Photo+not+available';  // Replace with placeholder
+                  <img
+                    src={url}
+                    alt={`Photo ${index + 1}`}
+                    style={{ width: '100%' }}
+                    onError={(e) => {
+                      console.error('Image failed to load:', e) // Log the error event object
+                      console.error('Failed URL:', e.currentTarget.src) // Log the failed image URL
+                      e.currentTarget.src =
+                        'https://via.placeholder.com/600x400?text=Photo+not+available' // Replace with placeholder
                     }}
                   />
                 </div>

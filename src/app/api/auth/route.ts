@@ -10,10 +10,8 @@ const oauth2Client = new google.auth.OAuth2(
 export async function GET(req: NextRequest) {
   const authUrl = oauth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: [
-      'https://www.googleapis.com/auth/drive.file',
-    ],
+    scope: ['https://www.googleapis.com/auth/drive.file'],
   })
-  
+
   return NextResponse.redirect(authUrl)
 }

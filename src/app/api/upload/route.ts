@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     console.error(e)
     return NextResponse.json(
       { error: 'Failed to save photos and comment' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
