@@ -78,10 +78,11 @@ const FotkyPage = () => {
     const slides = document.getElementsByClassName('fotky-photo-slide')
     if (slides[index]) {
       const images = slides[index].getElementsByClassName('fotky-photo')
-      for (let img of images) {
-        img.style.animation = 'none'
-        img.offsetHeight // Trigger reflow
-        img.style.animation = ''
+      for (let img of Array.from(images)) {
+        const htmlImageElement = img as HTMLElement
+        htmlImageElement.style.animation = 'none'
+        htmlImageElement.offsetHeight // Trigger reflow
+        htmlImageElement.style.animation = ''
       }
     }
   }
