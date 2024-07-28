@@ -1,0 +1,53 @@
+/* fotky-gallery.css */
+
+/* Carousel container styling */
+.carousel-container {
+  width: 100%; /* Adjust width as needed */
+  height: 100%; /* Adjust height as needed */
+  overflow: hidden;
+  position: relative;
+}
+
+/* Additional styling for your component */
+.fotky-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.fotky-title {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.fotky-photo-slide {
+  position: relative;
+}
+
+.fotky-photo {
+  max-width: 100%;
+  max-height: 90vh;
+  margin: auto;
+  animation: zoomEffect 10s ease-in-out infinite;
+}
+
+@keyframes zoomEffect {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1);
+  }
+}
+
+.fotky-photo-slide p {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 1em;
+  margin: 0;
+}

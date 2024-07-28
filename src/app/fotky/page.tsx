@@ -5,6 +5,7 @@ import axios from 'axios'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
+import './fotky-gallery.css' // Import the new CSS file
 
 interface PhotoData {
   _id: string
@@ -36,13 +37,53 @@ const FotkyPage = () => {
   }, [])
 
   const settings = {
-    dots: true,
+    dots: false,
     infinite: true,
-    speed: 500,
+    speed: 1000,
     slidesToShow: 1,
     slidesToScroll: 1,
+    fade: true,
     autoplay: true,
-    autoplaySpeed: 5000,
+    autoplaySpeed: 7500,
+    beforeChange: (current, next) => resetAnimation(next),
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          initialSlide: 1,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  }
+
+  const resetAnimation = (index) => {
+    const slides = document.getElementsByClassName('fotky-photo-slide')
+    if (slides[index]) {
+      const images = slides[index].getElementsByClassName('fotky-photo')
+      for (let img of images) {
+        img.style.animation = 'none'
+        img.offsetHeight // Trigger reflow
+        img.style.animation = ''
+      }
+    }
   }
 
   if (loading) {
@@ -54,18 +95,21 @@ const FotkyPage = () => {
   }
 
   return (
-    <div>
-      <h1>Fotky</h1>
+    <div className="fotky-container">
+      <h1 className="fotky-title">Fotky</h1>
       {photos.length > 0 ? (
-        <Slider {...settings}>
-          {photos.map((photoSet) => (
-            <div key={photoSet._id}>
-              {photoSet.photoUrls.map((url, index) => (
-                <div key={index}>
+        <div className="carousel-container">
+          <Slider {...settings}>
+            {photos.flatMap((photoSet) =>
+              photoSet.photoUrls.map((url, index) => (
+                <div
+                  key={`${photoSet._id}-${index}`}
+                  className="fotky-photo-slide"
+                >
                   <img
                     src={url}
                     alt={`Photo ${index + 1}`}
-                    style={{ width: '100%' }}
+                    className="fotky-photo"
                     onError={(e) => {
                       console.error('Image failed to load:', e) // Log the error event object
                       console.error('Failed URL:', e.currentTarget.src) // Log the failed image URL
@@ -73,12 +117,12 @@ const FotkyPage = () => {
                         'https://via.placeholder.com/600x400?text=Photo+not+available' // Replace with placeholder
                     }}
                   />
+                  <p>{photoSet.comment}</p>
                 </div>
-              ))}
-              <p>{photoSet.comment}</p>
-            </div>
-          ))}
-        </Slider>
+              )),
+            )}
+          </Slider>
+        </div>
       ) : (
         <p>No photos available.</p>
       )}
