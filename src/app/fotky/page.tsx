@@ -108,7 +108,7 @@ const FotkyPage = () => {
 
   return (
     <div className="fotky-container">
-      <h1 className="fotky-title">Fotky</h1>
+      <h1 className="fotky-title">Fotokoutek #svatbahrdinu</h1>
       {photos.length > 0 ? (
         <div className="carousel-container">
           <Slider {...settings}>
@@ -136,7 +136,7 @@ const FotkyPage = () => {
           </Slider>
         </div>
       ) : (
-        <p>No photos available.</p>
+        <p>Žádné fotky k dispozici.</p>
       )}
     </div>
   )

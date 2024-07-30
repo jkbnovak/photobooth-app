@@ -1,7 +1,7 @@
 // src/app/fotky/layout.tsx
 
 export const metadata = {
-  title: 'Fotky Page',
+  title: 'Fotokoutek #svatbahrdinu',
   description: 'Gallery of photos',
 }
 

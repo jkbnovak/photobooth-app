@@ -1,4 +1,9 @@
-/* fotky-gallery.css */
+/* Ensure the whole page has a white background */
+body {
+  background-color: white;
+  color: black; /* Set default text color to black */
+  margin: 0;
+}
 
 /* Carousel container styling */
 .carousel-container {
@@ -17,6 +22,9 @@
 .fotky-title {
   font-size: 2em;
   margin-bottom: 20px;
+  background-color: white; /* Ensure white background */
+  color: black; /* Ensure black text color */
+  padding: 10px; /* Add some padding for better readability */
 }
 
 .fotky-photo-slide {
