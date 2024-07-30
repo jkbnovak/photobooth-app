@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import axios from 'axios'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
@@ -18,23 +18,44 @@ const FotkyPage = () => {
   const [photos, setPhotos] = useState<PhotoData[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [page, setPage] = useState<number>(1)
+  const [hasMore, setHasMore] = useState<boolean>(true)
+  const observer = useRef<IntersectionObserver>()
+
+  const fetchPhotos = async (page: number) => {
+    try {
+      const response = await axios.get(`/api/photos?page=${page}&limit=10`)
+      console.log('Fetched photos:', response.data)
+      if (response.data.length > 0) {
+        setPhotos((prevPhotos) => [...prevPhotos, ...response.data])
+      } else {
+        setHasMore(false)
+      }
+    } catch (err) {
+      console.error('Failed to fetch photos:', err)
+      setError('Failed to fetch photos. Please try again later.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchPhotos = async () => {
-      try {
-        const response = await axios.get('/api/photos?n=10')
-        console.log('Fetched photos:', response.data)
-        setPhotos(response.data)
-      } catch (err) {
-        console.error('Failed to fetch photos:', err)
-        setError('Failed to fetch photos. Please try again later.')
-      } finally {
-        setLoading(false)
-      }
-    }
+    fetchPhotos(page)
+  }, [page])
 
-    fetchPhotos()
-  }, [])
+  const lastPhotoElementRef = useCallback(
+    (node) => {
+      if (loading) return
+      if (observer.current) observer.current.disconnect()
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prevPage) => prevPage + 1)
+        }
+      })
+      if (node) observer.current.observe(node)
+    },
+    [loading, hasMore],
+  )
 
   const settings = {
     dots: false,
@@ -87,8 +108,8 @@ const FotkyPage = () => {
     }
   }
 
-  if (loading) {
-    return <div>Loading...</div>
+  if (loading && photos.length === 0) {
+    return <div>Načítám...</div>
   }
 
   if (error) {
@@ -101,26 +122,32 @@ const FotkyPage = () => {
       {photos.length > 0 ? (
         <div className="carousel-container">
           <Slider {...settings}>
-            {photos.flatMap((photoSet) =>
-              photoSet.photoUrls.map((url, index) => (
-                <div
-                  key={`${photoSet._id}-${index}`}
-                  className="fotky-photo-slide"
-                >
-                  <img
-                    src={url}
-                    alt={`Photo ${index + 1}`}
-                    className="fotky-photo"
-                    onError={(e) => {
-                      console.error('Image failed to load:', e) // Log the error event object
-                      console.error('Failed URL:', e.currentTarget.src) // Log the failed image URL
-                      e.currentTarget.src =
-                        'https://via.placeholder.com/600x400?text=Photo+not+available' // Replace with placeholder
-                    }}
-                  />
-                  <p>{photoSet.comment}</p>
-                </div>
-              )),
+            {photos.flatMap((photoSet, photoIndex) =>
+              photoSet.photoUrls.map((url, index) => {
+                const isLastPhoto =
+                  photoIndex === photos.length - 1 &&
+                  index === photoSet.photoUrls.length - 1
+                return (
+                  <div
+                    key={`${photoSet._id}-${index}`}
+                    className="fotky-photo-slide"
+                    ref={isLastPhoto ? lastPhotoElementRef : null}
+                  >
+                    <img
+                      src={url}
+                      alt={`Photo ${index + 1}`}
+                      className="fotky-photo"
+                      onError={(e) => {
+                        console.error('Image failed to load:', e)
+                        console.error('Failed URL:', e.currentTarget.src)
+                        e.currentTarget.src =
+                          'https://via.placeholder.com/600x400?text=Photo+not+available'
+                      }}
+                    />
+                    <p>{photoSet.comment}</p>
+                  </div>
+                )
+              }),
             )}
           </Slider>
         </div>

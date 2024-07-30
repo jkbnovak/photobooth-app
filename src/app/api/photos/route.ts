@@ -48,11 +48,15 @@ export async function GET(req: NextRequest) {
     const db = client.db('photobooth')
     const collection = db.collection('photos')
 
-    const N = parseInt(req.nextUrl.searchParams.get('n') || '10', 10)
+    const page = parseInt(req.nextUrl.searchParams.get('page') || '1', 10)
+    const limit = parseInt(req.nextUrl.searchParams.get('limit') || '10', 10)
+    const skip = (page - 1) * limit
+
     const photos = await collection
       .find()
       .sort({ createdAt: -1 })
-      .limit(N)
+      .skip(skip)
+      .limit(limit)
       .toArray()
 
     const oauth2Client = await getAuthenticatedClient()
