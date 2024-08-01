@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     const db = client.db('photobooth')
     const collection = db.collection('photos')
 
-    const oauth2Client = await getAuthenticatedClient() 
+    const oauth2Client = await getAuthenticatedClient()
     const drive = google.drive({ version: 'v3', auth: oauth2Client })
 
     const webFolderId = await getOrCreateWebFolder(drive)
