@@ -1,174 +1,8 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
 import clientPromise from '@/lib/mongodb'
 import { PassThrough } from 'stream'
 import sharp from 'sharp'
-import Busboy from 'busboy'
-
-export const GET = (req: NextApiRequest, res: NextApiResponse) => {
-  res.status(200).json({ message: 'Use POST method to upload images' })
-}
-
-export const POST = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' })
-    return
-  }
-
-  try {
-    const { files, fields } = await parseFormData(req)
-    const comment = fields.comment || ''
-    const oauth2Client = await getAuthenticatedClient()
-    const drive = google.drive({ version: 'v3', auth: oauth2Client })
-    const webFolderId = await getOrCreateWebFolder(drive)
-
-    const photoIds: string[] = []
-    const reducedPhotoIds: string[] = []
-
-    for (const file of files) {
-      try {
-        const buffer = file.buffer
-
-        const originalFileMetadata = {
-          name: `photo_${Date.now()}.jpg`,
-          mimeType: 'image/jpeg',
-        }
-
-        const originalResponse = await drive.files.create({
-          requestBody: originalFileMetadata,
-          media: {
-            mimeType: 'image/jpeg',
-            body: bufferToStream(buffer).pipe(sharp().rotate()),
-          },
-          fields: 'id',
-        })
-
-        const originalPhotoId = originalResponse.data.id
-
-        await drive.permissions.create({
-          fileId: originalPhotoId,
-          requestBody: {
-            role: 'reader',
-            type: 'anyone',
-          },
-        })
-
-        photoIds.push(originalPhotoId)
-
-        // Get image metadata to determine aspect ratio
-        const metadata = await sharp(buffer).metadata()
-        const { width, height } = metadata
-
-        let resizeOptions
-        if (width > height) {
-          // Horizontal photo
-          resizeOptions = { height: 800 }
-        } else {
-          // Vertical or square photo
-          resizeOptions = { width: 800 }
-        }
-
-        // Create reduced photo with corrected orientation and maintained aspect ratio
-        const reducedFileMetadata = {
-          name: `photo_reduced_${Date.now()}.jpg`,
-          mimeType: 'image/jpeg',
-          parents: [webFolderId], // Store in "web" folder
-        }
-
-        const reducedResponse = await drive.files.create({
-          requestBody: reducedFileMetadata,
-          media: {
-            mimeType: 'image/jpeg',
-            body: bufferToStream(buffer).pipe(sharp().resize(resizeOptions)),
-          },
-          fields: 'id',
-        })
-
-        const reducedPhotoId = reducedResponse.data.id
-
-        await drive.permissions.create({
-          fileId: reducedPhotoId,
-          requestBody: {
-            role: 'reader',
-            type: 'anyone',
-          },
-        })
-
-        reducedPhotoIds.push(reducedPhotoId)
-      } catch (error) {
-        console.error('Error processing file stream with sharp:', error)
-      }
-    }
-
-    const client = await clientPromise
-    const db = client.db('photobooth')
-    const collection = db.collection('photos')
-
-    await collection.insertOne({
-      photoIds,
-      reducedPhotoIds,
-      comment,
-      createdAt: new Date(),
-    })
-
-    console.log('Successfully inserted photo IDs into photos collection')
-
-    res.status(200).json({
-      message: 'Photos and comment saved',
-      photoIds,
-      reducedPhotoIds,
-    })
-  } catch (e) {
-    console.error('Error occurred:', e)
-    res.status(500).json({ error: 'Failed to save photos and comment' })
-  }
-}
-
-function bufferToStream(buffer: Buffer) {
-  const stream = new PassThrough()
-  stream.end(buffer)
-  return stream
-}
-
-function parseFormData(req: NextApiRequest): Promise<ParsedFormData> {
-  return new Promise((resolve, reject) => {
-    const busboy = Busboy({ headers: req.headers })
-    const result: ParsedFormData = {
-      files: [],
-      fields: {},
-    }
-
-    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-      const fileBuffer: Buffer[] = []
-      file.on('data', (data) => {
-        fileBuffer.push(data)
-      })
-      file.on('end', () => {
-        result.files.push({
-          fieldname,
-          originalname: filename,
-          encoding,
-          mimetype,
-          buffer: Buffer.concat(fileBuffer),
-        })
-      })
-    })
-
-    busboy.on('field', (fieldname, val) => {
-      result.fields[fieldname] = val
-    })
-
-    busboy.on('finish', () => {
-      resolve(result)
-    })
-
-    busboy.on('error', (err) => {
-      reject(err)
-    })
-
-    req.pipe(busboy)
-  })
-}
 
 async function getAuthenticatedClient() {
   const client = await clientPromise
@@ -210,7 +44,7 @@ async function getAuthenticatedClient() {
   return oauth2Client
 }
 
-async function getOrCreateWebFolder(drive: any) {
+async function getOrCreateWebFolder(drive) {
   const folderName = 'web'
   const query = `name='${folderName}' and mimeType='application/vnd.google-apps.folder' and trashed=false`
 
@@ -220,7 +54,7 @@ async function getOrCreateWebFolder(drive: any) {
     spaces: 'drive',
   })
 
-  let folder = response.data.files.find((file: any) => file.name === folderName)
+  let folder = response.data.files.find((file) => file.name === folderName)
 
   if (!folder) {
     const fileMetadata = {
@@ -235,4 +69,136 @@ async function getOrCreateWebFolder(drive: any) {
   }
 
   return folder.id
+}
+
+function bufferToStream(buffer) {
+  const stream = new PassThrough()
+  stream.end(buffer)
+  return stream
+}
+
+export async function POST(request: NextRequest) {
+  const { photos, comment } = await request.json()
+
+  try {
+    const client = await clientPromise
+    const db = client.db('photobooth')
+    const collection = db.collection('photos')
+
+    const oauth2Client = await getAuthenticatedClient()
+    const drive = google.drive({ version: 'v3', auth: oauth2Client })
+
+    const webFolderId = await getOrCreateWebFolder(drive)
+
+    const photoIds: string[] = []
+    const reducedPhotoIds: string[] = []
+
+    for (const photo of photos) {
+      const buffer = Buffer.from(photo.split(',')[1], 'base64')
+
+      // Correct orientation and upload original photo
+      const originalBuffer = await sharp(buffer).rotate().toBuffer()
+
+      const originalFileMetadata = {
+        name: `photo_${Date.now()}.jpg`,
+        mimeType: 'image/jpeg',
+      }
+
+      const originalMedia = {
+        mimeType: 'image/jpeg',
+        body: bufferToStream(originalBuffer),
+      }
+
+      const originalResponse = await drive.files.create({
+        requestBody: originalFileMetadata,
+        media: originalMedia,
+        fields: 'id',
+      })
+
+      const originalPhotoId = originalResponse.data.id
+
+      await drive.permissions.create({
+        fileId: originalPhotoId,
+        requestBody: {
+          role: 'reader',
+          type: 'anyone',
+        },
+      })
+
+      photoIds.push(originalPhotoId)
+
+      // Get image metadata to determine aspect ratio
+      const metadata = await sharp(originalBuffer).metadata()
+      const { width, height } = metadata
+
+      let resizeOptions
+      if (width > height) {
+        // Horizontal photo
+        resizeOptions = { height: 800 }
+      } else {
+        // Vertical or square photo
+        resizeOptions = { width: 800 }
+      }
+
+      // Create reduced photo with corrected orientation and maintained aspect ratio
+      const reducedBuffer = await sharp(originalBuffer)
+        .resize(resizeOptions)
+        .toBuffer()
+
+      const reducedFileMetadata = {
+        name: `photo_reduced_${Date.now()}.jpg`,
+        mimeType: 'image/jpeg',
+        parents: [webFolderId], // Store in "web" folder
+      }
+
+      const reducedMedia = {
+        mimeType: 'image/jpeg',
+        body: bufferToStream(reducedBuffer),
+      }
+
+      const reducedResponse = await drive.files.create({
+        requestBody: reducedFileMetadata,
+        media: reducedMedia,
+        fields: 'id',
+      })
+
+      const reducedPhotoId = reducedResponse.data.id
+
+      await drive.permissions.create({
+        fileId: reducedPhotoId,
+        requestBody: {
+          role: 'reader',
+          type: 'anyone',
+        },
+      })
+
+      reducedPhotoIds.push(reducedPhotoId)
+    }
+
+    // Logging before insertion
+    console.log('Inserting original photo IDs:', photoIds)
+    console.log('Inserting reduced photo IDs:', reducedPhotoIds)
+
+    await collection.insertOne({
+      photoIds,
+      reducedPhotoIds,
+      comment,
+      createdAt: new Date(),
+    })
+
+    // Logging after insertion
+    console.log('Successfully inserted photo IDs into photos collection')
+
+    return NextResponse.json({
+      message: 'Photos and comment saved',
+      photoIds,
+      reducedPhotoIds,
+    })
+  } catch (e) {
+    console.error('Error occurred:', e)
+    return NextResponse.json(
+      { error: 'Failed to save photos and comment' },
+      { status: 500 },
+    )
+  }
 }
