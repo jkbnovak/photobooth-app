@@ -96,7 +96,9 @@ export async function POST(request: NextRequest) {
     for (const photo of photos) {
       const buffer = Buffer.from(photo.split(',')[1], 'base64')
 
-      // Upload original photo
+      // Correct orientation and upload original photo
+      const originalBuffer = await sharp(buffer).rotate().toBuffer()
+
       const originalFileMetadata = {
         name: `photo_${Date.now()}.jpg`,
         mimeType: 'image/jpeg',
@@ -104,7 +106,7 @@ export async function POST(request: NextRequest) {
 
       const originalMedia = {
         mimeType: 'image/jpeg',
-        body: bufferToStream(buffer),
+        body: bufferToStream(originalBuffer),
       }
 
       const originalResponse = await drive.files.create({
@@ -125,8 +127,8 @@ export async function POST(request: NextRequest) {
 
       photoIds.push(originalPhotoId)
 
-      // Create reduced photo
-      const reducedBuffer = await sharp(buffer).resize(800).toBuffer()
+      // Create reduced photo with corrected orientation
+      const reducedBuffer = await sharp(originalBuffer).resize(800).toBuffer()
 
       const reducedFileMetadata = {
         name: `photo_reduced_${Date.now()}.jpg`,
