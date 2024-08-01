@@ -10,7 +10,9 @@
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md}'"
   },
   "dependencies": {
+    "@types/busboy": "^1.5.4",
     "axios": "^1.7.2",
+    "busboy": "^1.6.0",
     "embla-carousel-react": "^8.1.7",
     "formidable": "^3.5.1",
     "googleapis": "^140.0.1",
