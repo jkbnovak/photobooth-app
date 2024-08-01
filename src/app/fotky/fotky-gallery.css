@@ -35,7 +35,7 @@ body {
   max-width: 100%;
   max-height: 90vh;
   margin: auto;
-  animation: zoomEffect 10s ease-in-out infinite;
+  animation: zoomEffect 30s ease-in-out infinite;
 }
 
 @keyframes zoomEffect {
@@ -43,7 +43,7 @@ body {
     transform: scale(1);
   }
   100% {
-    transform: scale(1.1);
+    transform: scale(1.3);
   }
 }
 

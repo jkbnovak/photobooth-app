@@ -43,9 +43,11 @@ const FotkyPage = () => {
   const settings = {
     dots: false,
     infinite: true,
-    speed: 10000,
+    speed: 2000,
+    autoplaySpeed: 7500,
     slidesToShow: 1,
     slidesToScroll: 1,
+    cssEase: 'cubic-bezier(0.7, 0, 0.3, 1)',
     fade: true,
     autoplay: true,
     beforeChange: (current, next) => resetAnimation(next),
