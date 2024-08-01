@@ -44,7 +44,7 @@ const FotkyPage = () => {
     dots: false,
     infinite: true,
     speed: 2000,
-    autoplaySpeed: 7500,
+    autoplaySpeed: 10000,
     slidesToShow: 1,
     slidesToScroll: 1,
     cssEase: 'cubic-bezier(0.7, 0, 0.3, 1)',

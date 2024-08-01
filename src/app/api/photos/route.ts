@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
     const drive = google.drive({ version: 'v3', auth: oauth2Client })
 
     for (const photo of photos) {
-      const urls = photo.photoIds.map((id) => `/api/proxy?id=${id}`)
+      const urls = photo.reducedPhotoIds.map((id) => `/api/proxy?id=${id}`)
       photo.photoUrls = urls
     }
 
