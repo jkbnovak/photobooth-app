@@ -43,7 +43,7 @@ const FotkyPage = () => {
   const settings = {
     dots: false,
     infinite: true,
-    speed: 1000,
+    speed: 10000,
     slidesToShow: 1,
     slidesToScroll: 1,
     fade: true,
