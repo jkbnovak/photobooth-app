@@ -127,8 +127,23 @@ export async function POST(request: NextRequest) {
 
       photoIds.push(originalPhotoId)
 
-      // Create reduced photo with corrected orientation
-      const reducedBuffer = await sharp(originalBuffer).resize(800).toBuffer()
+      // Get image metadata to determine aspect ratio
+      const metadata = await sharp(originalBuffer).metadata()
+      const { width, height } = metadata
+
+      let resizeOptions
+      if (width > height) {
+        // Horizontal photo
+        resizeOptions = { height: 800 }
+      } else {
+        // Vertical or square photo
+        resizeOptions = { width: 800 }
+      }
+
+      // Create reduced photo with corrected orientation and maintained aspect ratio
+      const reducedBuffer = await sharp(originalBuffer)
+        .resize(resizeOptions)
+        .toBuffer()
 
       const reducedFileMetadata = {
         name: `photo_reduced_${Date.now()}.jpg`,
