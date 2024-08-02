@@ -177,7 +177,7 @@ const Home = () => {
                 <li>
                   <strong>Přímé focení</strong>
                   <ul>
-                    <li>Klikněte na tlačítko "Přímé focení".</li>
+                    <li>Klikněte na tlačítko &quot;Přímé focení&quot;.</li>
                     <li>
                       Povolením přístupu k fotoaparátu na vašem zařízení se
                       spustí fotoaparát.
@@ -192,7 +192,9 @@ const Home = () => {
                 <li>
                   <strong>Nahrání z telefonu</strong>
                   <ul>
-                    <li>Klikněte na tlačítko "Nahrání z telefonu".</li>
+                    <li>
+                      Klikněte na tlačítko &quot;Nahrání z telefonu&quot;.
+                    </li>
                     <li>
                       Vyberte fotografii, kterou chcete nahrát, z vaší galerie.
                     </li>
@@ -210,8 +212,8 @@ const Home = () => {
                   <strong>Nápověda</strong>
                   <ul>
                     <li>
-                      Klikněte na tlačítko "Nápověda" pro zobrazení tohoto
-                      návodu.
+                      Klikněte na tlačítko &quot;Nápověda&quot; pro zobrazení
+                      tohoto návodu.
                     </li>
                     <li>
                       V nápovědě najdete podrobné informace o tom, jak používat
