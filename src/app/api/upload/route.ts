@@ -81,13 +81,13 @@ function bufferToStream(buffer) {
 function rotateImage(image, orientation) {
   switch (orientation) {
     case 3:
-      return image.rotate(180);
+      return image.rotate(180)
     case 6:
-      return image.rotate(90);
+      return image.rotate(90)
     case 8:
-      return image.rotate(-90);
+      return image.rotate(-90)
     default:
-      return image;
+      return image
   }
 }
 
@@ -162,7 +162,12 @@ export async function POST(request: NextRequest) {
         }
 
         // Create reduced photo with corrected orientation and maintained aspect ratio
-        const reducedImage = rotatedImage.clone().resize(resizeOptions.width || Jimp.AUTO, resizeOptions.height || Jimp.AUTO)
+        const reducedImage = rotatedImage
+          .clone()
+          .resize(
+            resizeOptions.width || Jimp.AUTO,
+            resizeOptions.height || Jimp.AUTO,
+          )
         const reducedBuffer = await reducedImage.getBufferAsync(Jimp.MIME_JPEG)
 
         const reducedFileMetadata = {
