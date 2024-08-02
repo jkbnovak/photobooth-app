@@ -171,7 +171,6 @@ const Home = () => {
               Návod pro aplikaci digitální fotokoutek
             </h1>
             <p className={styles.howItWorksText}>
-              <strong>Výběr akce na stránce</strong>
               Na otevřené stránce uvidíte tři tlačítka:
               <ul>
                 <li>
