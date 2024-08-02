@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
 import clientPromise from '@/lib/mongodb'
 import { PassThrough } from 'stream'
-import sharp from 'sharp'
+import Jimp from 'jimp'
+import ExifParser from 'exif-parser'
 
 async function getAuthenticatedClient() {
   const client = await clientPromise
@@ -77,6 +78,19 @@ function bufferToStream(buffer) {
   return stream
 }
 
+function rotateImage(image, orientation) {
+  switch (orientation) {
+    case 3:
+      return image.rotate(180);
+    case 6:
+      return image.rotate(90);
+    case 8:
+      return image.rotate(-90);
+    default:
+      return image;
+  }
+}
+
 export async function POST(request: NextRequest) {
   const { photos, comment } = await request.json()
 
@@ -90,89 +104,99 @@ export async function POST(request: NextRequest) {
 
     const webFolderId = await getOrCreateWebFolder(drive)
 
-    const photoIds: string[] = []
-    const reducedPhotoIds: string[] = []
+    const photoIds = []
+    const reducedPhotoIds = []
 
     for (const photo of photos) {
       const buffer = Buffer.from(photo.split(',')[1], 'base64')
 
-      // Correct orientation and upload original photo
-      const originalBuffer = await sharp(buffer).rotate().toBuffer()
+      try {
+        // Parse EXIF data
+        const parser = ExifParser.create(buffer)
+        const exifData = parser.parse()
+        const orientation = exifData.tags.Orientation
 
-      const originalFileMetadata = {
-        name: `photo_${Date.now()}.jpg`,
-        mimeType: 'image/jpeg',
+        // Correct orientation and upload original photo
+        const image = await Jimp.read(buffer)
+        const rotatedImage = rotateImage(image, orientation)
+        const originalBuffer = await rotatedImage.getBufferAsync(Jimp.MIME_JPEG)
+
+        const originalFileMetadata = {
+          name: `photo_${Date.now()}.jpg`,
+          mimeType: 'image/jpeg',
+        }
+
+        const originalMedia = {
+          mimeType: 'image/jpeg',
+          body: bufferToStream(originalBuffer),
+        }
+
+        const originalResponse = await drive.files.create({
+          requestBody: originalFileMetadata,
+          media: originalMedia,
+          fields: 'id',
+        })
+
+        const originalPhotoId = originalResponse.data.id
+
+        await drive.permissions.create({
+          fileId: originalPhotoId,
+          requestBody: {
+            role: 'reader',
+            type: 'anyone',
+          },
+        })
+
+        photoIds.push(originalPhotoId)
+
+        // Get image dimensions to determine aspect ratio
+        const { width, height } = rotatedImage.bitmap
+
+        let resizeOptions
+        if (width > height) {
+          // Horizontal photo
+          resizeOptions = { height: 800 }
+        } else {
+          // Vertical or square photo
+          resizeOptions = { width: 800 }
+        }
+
+        // Create reduced photo with corrected orientation and maintained aspect ratio
+        const reducedImage = rotatedImage.clone().resize(resizeOptions.width || Jimp.AUTO, resizeOptions.height || Jimp.AUTO)
+        const reducedBuffer = await reducedImage.getBufferAsync(Jimp.MIME_JPEG)
+
+        const reducedFileMetadata = {
+          name: `photo_reduced_${Date.now()}.jpg`,
+          mimeType: 'image/jpeg',
+          parents: [webFolderId], // Store in "web" folder
+        }
+
+        const reducedMedia = {
+          mimeType: 'image/jpeg',
+          body: bufferToStream(reducedBuffer),
+        }
+
+        const reducedResponse = await drive.files.create({
+          requestBody: reducedFileMetadata,
+          media: reducedMedia,
+          fields: 'id',
+        })
+
+        const reducedPhotoId = reducedResponse.data.id
+
+        await drive.permissions.create({
+          fileId: reducedPhotoId,
+          requestBody: {
+            role: 'reader',
+            type: 'anyone',
+          },
+        })
+
+        reducedPhotoIds.push(reducedPhotoId)
+      } catch (jimpError) {
+        console.error('Error processing image with Jimp:', jimpError)
+        continue // Skip this photo and move to the next one
       }
-
-      const originalMedia = {
-        mimeType: 'image/jpeg',
-        body: bufferToStream(originalBuffer),
-      }
-
-      const originalResponse = await drive.files.create({
-        requestBody: originalFileMetadata,
-        media: originalMedia,
-        fields: 'id',
-      })
-
-      const originalPhotoId = originalResponse.data.id
-
-      await drive.permissions.create({
-        fileId: originalPhotoId,
-        requestBody: {
-          role: 'reader',
-          type: 'anyone',
-        },
-      })
-
-      photoIds.push(originalPhotoId)
-
-      // Get image metadata to determine aspect ratio
-      const metadata = await sharp(originalBuffer).metadata()
-      const { width, height } = metadata
-
-      let resizeOptions
-      if (width > height) {
-        // Horizontal photo
-        resizeOptions = { height: 800 }
-      } else {
-        // Vertical or square photo
-        resizeOptions = { width: 800 }
-      }
-
-      // Create reduced photo with corrected orientation and maintained aspect ratio
-      const reducedBuffer = await sharp(originalBuffer)
-        .resize(resizeOptions)
-        .toBuffer()
-
-      const reducedFileMetadata = {
-        name: `photo_reduced_${Date.now()}.jpg`,
-        mimeType: 'image/jpeg',
-        parents: [webFolderId], // Store in "web" folder
-      }
-
-      const reducedMedia = {
-        mimeType: 'image/jpeg',
-        body: bufferToStream(reducedBuffer),
-      }
-
-      const reducedResponse = await drive.files.create({
-        requestBody: reducedFileMetadata,
-        media: reducedMedia,
-        fields: 'id',
-      })
-
-      const reducedPhotoId = reducedResponse.data.id
-
-      await drive.permissions.create({
-        fileId: reducedPhotoId,
-        requestBody: {
-          role: 'reader',
-          type: 'anyone',
-        },
-      })
-
-      reducedPhotoIds.push(reducedPhotoId)
     }
 
     // Logging before insertion
