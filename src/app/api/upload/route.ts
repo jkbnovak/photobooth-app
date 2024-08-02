@@ -80,12 +80,23 @@ function bufferToStream(buffer) {
 
 function rotateImage(image, orientation) {
   switch (orientation) {
+    case 1:
+      // no transformation necessary
+      return image
     case 3:
       return image.rotate(180)
     case 6:
       return image.rotate(90)
     case 8:
       return image.rotate(-90)
+    case 2:
+      return image.flip(false, true)
+    case 4:
+      return image.rotate(180).flip(false, true)
+    case 5:
+      return image.rotate(90).flip(false, true)
+    case 7:
+      return image.rotate(-90).flip(false, true)
     default:
       return image
   }
