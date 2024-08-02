@@ -167,13 +167,81 @@ const Home = () => {
           onClick={closeHowItWorksModal}
         >
           <div className={styles.howItWorksContent}>
-            <h1 className={styles.title}>How does it work?</h1>
+            <h1 className={styles.title}>
+              Návod pro aplikaci digitální fotokoutek
+            </h1>
             <p className={styles.howItWorksText}>
-              Tato aplikace vám umožňuje pořizovat fotografie, přidávat
-              komentáře a nahrávat je. Jednoduše klikněte na ikonu fotoaparátu
-              pro pořízení fotografie nebo na ikonu nahrávání pro výběr
-              fotografií z vašeho zařízení. Po výběru fotografií můžete přidat
-              komentář a poté stisknout tlačítko odeslat pro nahrání všeho.
+              <strong>Výběr akce na stránce</strong>
+              Na otevřené stránce uvidíte tři tlačítka:
+              <ul>
+                <li>
+                  <strong>Přímé focení</strong>
+                  <ul>
+                    <li>Klikněte na tlačítko "Přímé focení".</li>
+                    <li>
+                      Povolením přístupu k fotoaparátu na vašem zařízení se
+                      spustí fotoaparát.
+                    </li>
+                    <li>Pořiďte fotografii stisknutím tlačítka pro focení.</li>
+                    <li>
+                      Fotografie se automaticky uloží na soukromé úložiště a
+                      zobrazí se na televizi ve fotokoutku.
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Nahrání z telefonu</strong>
+                  <ul>
+                    <li>Klikněte na tlačítko "Nahrání z telefonu".</li>
+                    <li>
+                      Vyberte fotografii, kterou chcete nahrát, z vaší galerie.
+                    </li>
+                    <li>
+                      Fotografie se automaticky uloží na soukromé úložiště a
+                      zobrazí se na televizi ve fotokoutku.
+                    </li>
+                    <li>
+                      Tuto možnost můžete využít, pokud máte slabý signál Wi-Fi
+                      nebo se vyskytnou problémy s přímým focením.
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Nápověda</strong>
+                  <ul>
+                    <li>
+                      Klikněte na tlačítko "Nápověda" pro zobrazení tohoto
+                      návodu.
+                    </li>
+                    <li>
+                      V nápovědě najdete podrobné informace o tom, jak používat
+                      aplikaci digitálního fotokoutku.
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+              <strong>Zobrazení fotografií na televizi</strong>
+              <ul>
+                <li>
+                  Jakmile pořídíte nebo nahrajete fotografii, automaticky se
+                  promítne na televizi.
+                </li>
+                <li>
+                  Fotografie jsou bezpečně ukládány na soukromé úložiště a jsou
+                  dostupné pouze pro naše soukromé prohlížení.
+                </li>
+              </ul>
+              <strong>Důležité upozornění</strong>
+              <ul>
+                <li>
+                  Ujistěte se, že máte povolení k používání fotoaparátu a
+                  přístupu ke galerii na vašem zařízení.
+                </li>
+                <li>
+                  Pokud narazíte na jakýkoli problém, zkuste svědka nevěsty.
+                </li>
+              </ul>
+              Užijte si svůj zážitek s digitálním fotokoutkem!
             </p>
           </div>
         </div>
