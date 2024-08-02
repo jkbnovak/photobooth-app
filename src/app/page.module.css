@@ -289,10 +289,8 @@
 .howItWorksContent {
   background: white;
   padding: 20px;
-  margin-left: 20px;
   border-radius: 8px;
   text-align: justify;
-  max-width: 80%;
   max-height: 80%; /* Adjust this value as needed */
   overflow-y: auto; /* Enable vertical scrolling */
 }
