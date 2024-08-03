@@ -48,26 +48,37 @@ export async function GET(req: NextRequest) {
     const db = client.db('photobooth')
     const collection = db.collection('photos')
 
-    const page = parseInt(req.nextUrl.searchParams.get('page') || '1', 10)
-    const limit = parseInt(req.nextUrl.searchParams.get('limit') || '10', 10)
-    const skip = (page - 1) * limit
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000)
 
-    const photos = await collection
-      .find()
+    // Fetch photos from the last 30 minutes
+    let recentPhotos = await collection
+      .find({ createdAt: { $gte: thirtyMinutesAgo } })
       .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
       .toArray()
+
+    // If fewer than 10 photos, fetch the latest 10 photos
+    if (recentPhotos.length < 10) {
+      const additionalPhotos = await collection
+        .find()
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .toArray()
+
+      // Combine and sort to get the latest 10 photos
+      recentPhotos = Array.from(new Set([...recentPhotos, ...additionalPhotos]))
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .slice(0, 10)
+    }
 
     const oauth2Client = await getAuthenticatedClient()
     const drive = google.drive({ version: 'v3', auth: oauth2Client })
 
-    for (const photo of photos) {
+    for (const photo of recentPhotos) {
       const urls = photo.reducedPhotoIds.map((id) => `/api/proxy?id=${id}`)
       photo.photoUrls = urls
     }
 
-    return NextResponse.json(photos)
+    return NextResponse.json(recentPhotos)
   } catch (e) {
     console.error(e)
     return NextResponse.json(
