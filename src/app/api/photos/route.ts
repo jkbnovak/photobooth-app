@@ -48,27 +48,12 @@ export async function GET(req: NextRequest) {
     const db = client.db('photobooth')
     const collection = db.collection('photos')
 
-    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000)
-
-    // Fetch photos from the last 30 minutes
-    let recentPhotos = await collection
-      .find({ createdAt: { $gte: thirtyMinutesAgo } })
+    // Fetch the last 15 photos regardless of time taken
+    const recentPhotos = await collection
+      .find()
       .sort({ createdAt: -1 })
+      .limit(15)
       .toArray()
-
-    // If fewer than 10 photos, fetch the latest 10 photos
-    if (recentPhotos.length < 10) {
-      const additionalPhotos = await collection
-        .find()
-        .sort({ createdAt: -1 })
-        .limit(10)
-        .toArray()
-
-      // Combine and sort to get the latest 10 photos
-      recentPhotos = Array.from(new Set([...recentPhotos, ...additionalPhotos]))
-        .sort((a, b) => b.createdAt - a.createdAt)
-        .slice(0, 10)
-    }
 
     const oauth2Client = await getAuthenticatedClient()
     const drive = google.drive({ version: 'v3', auth: oauth2Client })
