@@ -63,7 +63,11 @@ export async function GET(req: NextRequest) {
       photo.photoUrls = urls
     }
 
-    return NextResponse.json(recentPhotos)
+    // Set cache-control header to no-store to prevent caching
+    const response = NextResponse.json(recentPhotos)
+    response.headers.set('Cache-Control', 'no-store')
+
+    return response
   } catch (e) {
     console.error(e)
     return NextResponse.json(
